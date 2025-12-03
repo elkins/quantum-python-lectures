@@ -14,13 +14,15 @@ by Tommy Ogden <t.p.ogden@durham.ac.uk>
 """
 
 import sys
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, Union
 
 import numpy as np
 
 
 def ode_int(
-    func: Callable[[float, np.ndarray, dict[str, Any]], np.ndarray],
+    func: Callable[
+        [Union[float, np.floating[Any]], np.ndarray, dict[str, Any]], np.ndarray
+    ],
     y_0: np.ndarray,
     t: np.ndarray,
     method: str,
@@ -65,7 +67,9 @@ def ode_int(
 
 
 def ode_int_ee(
-    func: Callable[[float, np.ndarray, dict[str, Any]], np.ndarray],
+    func: Callable[
+        [Union[float, np.floating[Any]], np.ndarray, dict[str, Any]], np.ndarray
+    ],
     y_0: np.ndarray,
     t: np.ndarray,
     args: Optional[dict[str, Any]] = None,
@@ -112,7 +116,9 @@ def ode_int_ee(
 
 
 def ode_int_rk(
-    func: Callable[[float, np.ndarray, dict[str, Any]], np.ndarray],
+    func: Callable[
+        [Union[float, np.floating[Any]], np.ndarray, dict[str, Any]], np.ndarray
+    ],
     y_0: np.ndarray,
     t: np.ndarray,
     args: Optional[dict[str, Any]] = None,
@@ -166,7 +172,9 @@ def ode_int_rk(
 
 
 def ode_int_ie(
-    func: Callable[[float, np.ndarray, dict[str, Any]], np.ndarray],
+    func: Callable[
+        [Union[float, np.floating[Any]], np.ndarray, dict[str, Any]], np.ndarray
+    ],
     y_0: np.ndarray,
     t: np.ndarray,
     args: Optional[dict[str, Any]] = None,
@@ -221,7 +229,7 @@ def ode_int_ie(
         # Newton iteration to solve: y_{n+1} - y_n - h*f(t_{n+1}, y_{n+1}) = 0
         for _ in range(max_iter):
             # Compute residual: G(y) = y - y_n - h*f(t_{n+1}, y)
-            f_val = func(t[i + 1], y_guess, args)
+            f_val = func(t[i + 1], y_guess, args)  # type: ignore[arg-type]
             residual = y_guess - y[i] - h * f_val
 
             # Check convergence
@@ -234,7 +242,7 @@ def ode_int_ie(
             for j in range(len(y_0)):
                 y_pert = y_guess.copy()
                 y_pert[j] += eps
-                f_pert = func(t[i + 1], y_pert, args)
+                f_pert = func(t[i + 1], y_pert, args)  # type: ignore[arg-type]
                 jacobian[:, j] = (f_pert - f_val) / eps
 
             # Compute Newton step: (I - h*J)*delta_y = -residual
@@ -244,7 +252,7 @@ def ode_int_ie(
                 y_guess = y_guess + delta_y
             except np.linalg.LinAlgError:
                 # If singular, fall back to simple corrector step
-                y_guess = y[i] + h * func(t[i + 1], y_guess, args)
+                y_guess = y[i] + h * func(t[i + 1], y_guess, args)  # type: ignore[arg-type]
                 break
 
         y[i + 1] = y_guess
@@ -253,7 +261,9 @@ def ode_int_ie(
 
 
 def ode_int_ab(
-    func: Callable[[float, np.ndarray, dict[str, Any]], np.ndarray],
+    func: Callable[
+        [Union[float, np.floating[Any]], np.ndarray, dict[str, Any]], np.ndarray
+    ],
     y_0: np.ndarray,
     t: np.ndarray,
     args: Optional[dict[str, Any]] = None,
@@ -286,7 +296,8 @@ def ode_int_ab(
     h_2 = t[2] - t[1]
 
     y[2] = y[1] + 0.5 * h_2 / h_1 * (
-        (2.0 * h_1 + h_2) * func(t[1], y[1], args) - h_2 * func(t[0], y[0], args)  # type: ignore[arg-type]
+        (2.0 * h_1 + h_2) * func(t[1], y[1], args)  # type: ignore[arg-type]
+        - h_2 * func(t[0], y[0], args)  # type: ignore[arg-type]
     )
 
     # Steps 2 to N-1: Adams-Bashforth

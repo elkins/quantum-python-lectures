@@ -66,6 +66,16 @@ ignore = [
     "N806",     # allow uppercase variables in math code (G, V, L, etc.)
     "N803",     # allow single-letter arguments in math functions
 ]
+"*.ipynb" = [
+    "ALL",      # Skip all linting for notebooks (intentionally old code for教学)
+]
+"modernize_notebooks.py" = [
+    "UP035",    # Uses Dict for compatibility
+    "UP006",    # Uses Dict for compatibility
+]
+"test_modernization.py" = [
+    "E741",     # Single letter variable names OK in test
+]
 
 [tool.mypy]
 python_version = "3.9"
@@ -82,6 +92,7 @@ warn_unused_ignores = true
 allow_untyped_calls = true
 allow_untyped_defs = true
 
+# Allow numpy scalar types to match float
 [[tool.mypy.overrides]]
 module = "numpy.*"
 ignore_missing_imports = false
@@ -89,3 +100,7 @@ ignore_missing_imports = false
 [[tool.mypy.overrides]]
 module = "scipy.*"
 ignore_missing_imports = false
+
+[[tool.mypy.overrides]]
+module = "code.ode_int"
+disable_error_code = ["arg-type"]

@@ -19,7 +19,7 @@ import pytest
 code_dir = Path(__file__).parent.parent / "code"
 sys.path.insert(0, str(code_dir))
 
-import ode_int
+import ode_int  # noqa: E402
 
 try:
     from scipy.integrate import solve_ivp
